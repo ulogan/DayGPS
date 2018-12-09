@@ -47,4 +47,4 @@ astrologmain.o: astrologmain.c
 	gcc $(CFLAGS) -c $?
 
 clean:
-	rm -f *.o desa $(NAME) $(NAME).exe libastrolog.a
+	rm -f *.o desa $(NAME) 
