@@ -1,0 +1,21 @@
+#!/usr/bin/python
+
+# imports
+import os, errno
+import inspect
+import sys, getopt;
+import datetime;
+
+yy = 1877
+mm = 8
+dd = 22
+off = 6840
+
+def newdate(str, yy, mm, dd, off):
+    d = datetime.date(yy, mm, dd)
+    nd = d + datetime.timedelta(off)
+    print str, nd
+
+newdate("Nyse :", 1877, 8, 22, 6840);
+newdate("Nyse2:", 1995, 12, 2, 6840);
+newdate("Nyse3:", 2114, 3, 13, 6840);
