@@ -1,0 +1,19 @@
+:
+naksatra()
+{
+    ./astrolog -qb Jan 1 2013 0:00 ST 8:00 122:02W 37:59N -s 0.872 -zi Pred Concord -b0 -7 -Yt -dm 1440 -R0 -R 2 -A 8 -6
+}
+
+tithi()
+{
+    ./astrolog -qb Jan 1 2013 0:00 ST 8:00 122:02W 37:59N -s 0.872 -zi Pred Concord -b0 -7 -Yt -dm 1440 -R0 -R 1 2 -A 8 -8
+}
+
+yogas()
+{
+    ./astrolog -qb Jan 1 2013 0:00 ST 8:00 122:02W 37:59N -s 0.872 -zi Pred Concord -b0 -7 -Yt -dm 1440 -R0 -R 1 2 -A 8 -%
+}
+
+naksatra
+#tithi
+#yogas
