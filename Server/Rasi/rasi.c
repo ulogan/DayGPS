@@ -7,7 +7,7 @@
 
 #define STR_LEN     1024
 
-char *cmd = "star";
+char *cmd = "rasi";
 
 extern int astromain(int targc, char *targv[]);
 
@@ -309,7 +309,7 @@ main(int argc, char *argv[])
 {
     char *base = basename(argv[0]);
 
-    if (strcmp(base, "star") == 0) {
+    if (strcmp(base, "rasi") == 0) {
         star();
     }
 
