@@ -3,16 +3,16 @@ ALIBS = ../Ast/libastrolog.a
 LIBS = -lm
 CFLAGS = -g
 
-all: star
+all: rasi
 
-star: star.o $(ALIBS)
+rasi: rasi.o $(ALIBS)
 	gcc $(CFLAGS) -o $@ $@.o $(ALIBS) $(LIBS)
 
 .c.o:
 	gcc $(CFLAGS) -c $?
 
 clean:
-	rm -f *.o star
+	rm -f *.o rasi
 
 install:
-	cp star /var/www/cgi-bin/rasi
+	cp rasi /var/www/cgi-bin/rasi
