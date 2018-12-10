@@ -15,4 +15,4 @@ clean:
 	rm -f *.o star
 
 install:
-	cp star /var/www/cgi-bin/star
+	cp star /var/www/cgi-bin/rasi
