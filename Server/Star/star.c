@@ -68,7 +68,7 @@ horoscope(tHorDetails *hd)
 
     pipe(fd);
 
-    if (1) {
+    if (0) {
         printhd(hd);
     }
 
@@ -245,7 +245,7 @@ star()
     tHorDetails hd;
     FILE *wfp = stdout;
     char str[STR_LEN];
-    char *tqs, *qs;
+    char *qs;
     char *s;
     int flag = 0;
     int i;
@@ -256,24 +256,17 @@ star()
     fprintf(wfp, "Content-Type: application/json;charset=UTF-8\n\n");
     fflush(wfp);
 
-    tqs = getenv("QUERY_STRING");
+    qs = getenv("QUERY_STRING");
 
-    if (tqs == NULL) {
+    if (qs == NULL) {
         printf("Invalid QUERY_STRING\n");
         exit(0);
     }
 
-    len = strlen(tqs);
-
-    for (i = 0; i < len; i++) {
-        if (tqs[i] == '&') {
-            qs = &tqs[i + 1];
-            break;
-        }
-    }
+    len = strlen(qs);
 
     if (0) {
-        printf("%d:%s\n%s\n", len, tqs, qs);
+        printf("%d:%s\n", len, qs);
     }
 
     memset(&hd, 0, sizeof(tHorDetails));
@@ -297,7 +290,7 @@ star()
             }
 
             gethd(str, &hd);
-            if (1) {
+            if (0) {
                 printhd(&hd);
             }
             flag = 1;
@@ -307,7 +300,7 @@ star()
 
     if (flag) {
         horoscope(&hd);
-        printf("%s %s\n", hd.rasi, hd.naksatra);
+        printf("Star: %s Rasi: %s\n", hd.naksatra, hd.rasi);
     }
 }
 
