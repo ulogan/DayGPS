@@ -1,0 +1,10 @@
+:
+
+export QUERY_STRING="name=Author|ValasarapakkamMadras|11|15|1967|08:13|ST|-5:30|80:17E|13:40N"
+
+export QUERY_STRING="name=Arjun|SantaClara|12|30|2000|05:06|ST|8:00|121:57W|37:21N"
+
+export QUERY_STRING="name=Pachum|Fremont|11|6|2003|05:06|ST|8:00|122:21W|37:52N"
+
+export QUERY_STRING="name=Test|Sunnyvale|12|31|2018|05:06|ST|8:00|122:00W|37:23N"
+
