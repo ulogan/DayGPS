@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <unistd.h>
+#include <time.h>
 
 #define STR_LEN     1024
 
@@ -18,6 +19,22 @@ static char *rasi[] = {
     "Kataka",   "Simha",        "Kanya",
     "Thula",    "Vrischika",    "Dhanas",
     "Makara",   "Kumbha",       "Meena"
+};
+
+static char *moPred[] = {
+    "",
+    "Good relations with women and friends, good food",
+    "Tiredness and expenditure",
+    "Gains of money, gold and good clothes",
+    "Accidents or ill health, trouble from relatives, sorrow and expenditure",
+    "Indigestion, loss of money, tiresome journeys",
+    "Victory over enemies, good health, increase in income and happiness",
+    "Friendship and gains, good comforts of bed, conjugal bliss and company of good friends",
+    "Trouble losses and expenses, illness, quarrels and worries",
+    "Loss of reputation and money, heavy expenses, intimidation and worry",
+    "Good name and reputation, gains and fulfillment of desires, happiness",
+    "Happiness, good friends, monetary gains, good comforts of bed and increase in respect",
+    "Carelessness and losses, misery, difference of opinion and arguments with others",
 };
 
 typedef struct sHorDetails {
@@ -150,7 +167,7 @@ horoscope(tHorDetails *hd)
             hd->ra = (hd->moondeg / 30.0);
             hd->nak = (hd->moondeg / (360.0 / 27.0));
 
-            hd->rasi = rasi[hd->nak];
+            hd->rasi = rasi[hd->ra];
             hd->naksatra = naksatras[hd->nak];
         }
 
@@ -174,20 +191,44 @@ strip_blanks(char *name, char *s)
     }
     name[k] = '\0';
 }
- 
+
+static char *mon[] = { "",
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep",
+    "Oct", "Nov", "Dec"
+};
+
+void
+transithd(tHorDetails *hd)
+{
+    struct tm *ctm;
+    time_t lclock;
+
+    lclock = time(&lclock);
+    ctm = localtime(&lclock);
+
+    strcpy(hd->name, "Transit");
+    strcpy(hd->place, "Sunnyvale");
+
+    sprintf(hd->day, "%d", ctm->tm_mday);
+    sprintf(hd->year, "%d", ctm->tm_year + 1900);
+    strcpy(hd->mon, mon[ctm->tm_mon + 1]);
+    sprintf(hd->time, "%d:%d", ctm->tm_hour, ctm->tm_min);
+    strcpy(hd->zone, "ST");
+    strcpy(hd->offset, "-8:00");
+    strcpy(hd->lon, "122:00W");
+    strcpy(hd->lat, "37:23N");
+    hd->dst = 1;
+}
+
 void
 gethd(char *optarg, tHorDetails *hd)
 {
     int i;
     int imon;
     char *s;
-    static char *mon[] = { "",
-            "Jan", "Feb", "Mar",
-            "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep",
-            "Oct", "Nov", "Dec"
-        };
-                
+               
     for (i = 0; ((s = strsep((char **)&optarg, "|")) != NULL); i++) {
         switch (i) {
         case 0:
@@ -239,10 +280,47 @@ gethd(char *optarg, tHorDetails *hd)
     }
 }
 
+int
+findDiff(int pos1, int pos2, int base)
+{
+    int diff;
+    
+    if (pos2 = pos1) {
+        diff = pos1 - pos2;
+    } else {
+        diff = pos2 - pos1;
+    }
+    
+    if (diff < 0) {
+        diff += base;
+    }
+
+    diff += 1;
+
+    return diff;
+}
+
+void
+transit(tHorDetails *hd)
+{
+    memset(hd, 0, sizeof(tHorDetails));
+
+    transithd(hd);
+    if (0) {
+        printhd(hd);
+    }
+
+    if (1) {
+        horoscope(hd);
+        printf("Transit Star: %s Rasi: %s (%d)\n", hd->naksatra, hd->rasi, hd->ra);
+    }
+}
+
 void
 star()
 {
     tHorDetails hd;
+    tHorDetails ht;
     FILE *wfp = stdout;
     char str[STR_LEN];
     char *qs;
@@ -252,6 +330,7 @@ star()
     int j;
     int k;
     int len;
+    int diff;
 
     fprintf(wfp, "Content-Type: application/json;charset=UTF-8\n\n");
     fflush(wfp);
@@ -300,8 +379,13 @@ star()
 
     if (flag) {
         horoscope(&hd);
-        printf("Star: %s Rasi: %s\n", hd.naksatra, hd.rasi);
+        printf("Star: %s Rasi: %s (%d)\n", hd.naksatra, hd.rasi, hd.ra);
     }
+
+    transit(&ht);
+
+    diff = findDiff(hd.ra, ht.ra, 12);
+    printf("Diff %d %s\n", diff, moPred[diff]);
 }
 
 int
