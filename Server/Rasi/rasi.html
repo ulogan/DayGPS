@@ -1,0 +1,23 @@
+<form>
+  Name: <input type="text" name="name"><br>
+  Current City: <input type="text" name="city"><br>
+  Birthday: <input type="date" name="bday"><br>
+  BirthTime: <input type="time" name="btime"><br>
+   
+<input type="submit" name="submit">
+<br>
+Lat: <input type="text" id="lat"> Lon: <input type="text" id="lon">
+</form>
+<script>
+$("#submit").onclick = function() {
+    var city = $(this).val()
+    $.getJSON("https://maps.googleapis.com/maps/api/geocode/json?address="+encodeURIComponent(city), function(val)
+    {
+        if(val.results.length) {
+            var location = val.results[0].geometry.location
+            $("#lat").val(location.lat)
+            $("#lon").val(location.lng)
+        }
+    })
+}
+</script>
