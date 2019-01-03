@@ -21,6 +21,14 @@ static char *rasi[] = {
     "Makara",   "Kumbha",       "Meena"
 };
 
+static char *mon[] = { "",
+    "Jan", "Feb", "Mar",
+    "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep",
+    "Oct", "Nov", "Dec"
+};
+
+/* array of possible Alexa return values for what a user's day will look like based on moon and rasi positions */
 static char *moPred[] = {
     "",
     "Good relations with women and friends, good food",
@@ -192,13 +200,7 @@ strip_blanks(char *name, char *s)
     name[k] = '\0';
 }
 
-static char *mon[] = { "",
-    "Jan", "Feb", "Mar",
-    "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep",
-    "Oct", "Nov", "Dec"
-};
-
+/*
 void
 transithd(tHorDetails *hd)
 {
@@ -220,7 +222,7 @@ transithd(tHorDetails *hd)
     strcpy(hd->lon, "122:00W");
     strcpy(hd->lat, "37:23N");
     hd->dst = 1;
-}
+}*/
 
 void
 gethd(char *optarg, tHorDetails *hd)
@@ -280,47 +282,65 @@ gethd(char *optarg, tHorDetails *hd)
     }
 }
 
+/* findDiff function updated with correct formula
+ * Logic: -if position one is greater than position two,
+ *              then the difference is the number of spaces from
+ *              position one to the base value of 12 added to the
+ *              second position (1 is added due to 0 based indexing) 
+ *        -if position two is greater than position one the value is
+ *              simply the absolute value of position one minus position 2
+ *              (1 is added for same reason of 0 based indexing) 
+ * Conditions: if position one and position two are equal,
+ *                  the formula will return '13' example of 6 and 6: ((12-6)+6+1),
+ *                  however this is a special corner case and the value should be one
+ */
 int
 findDiff(int pos1, int pos2, int base)
 {
     int diff;
-    
-    if (pos2 = pos1) {
-        diff = pos1 - pos2;
-    } else {
-        diff = pos2 - pos1;
-    }
-    
-    if (diff < 0) {
-        diff += base;
-    }
 
-    diff += 1;
+    if (pos1 >= pos2) {
+        diff = base - pos1 + pos2 + 1;
+
+        if (diff == 13) {
+            diff = 1;
+        }
+    } else {
+        diff = abs(pos1 - pos2) + 1;
+    }
 
     return diff;
 }
 
+/* constructor for hard coded tHorDetails object (values hard coded for testing purposes)
+ */
 void
 transit(tHorDetails *hd)
 {
-    memset(hd, 0, sizeof(tHorDetails));
+    time_t clock;
+    struct tm *ctm;
 
-    transithd(hd);
-    if (0) {
-        printhd(hd);
-    }
+    clock = time(&clock);
+    ctm = localtime(&clock);
 
-    if (1) {
-        horoscope(hd);
-        printf("Transit Star: %s Rasi: %s (%d)\n", hd->naksatra, hd->rasi, hd->ra);
-    }
+    strcpy(hd->name, "Transit");
+    strcpy(hd->place, "Sunnyvale");
+    strcpy(hd->mon, mon[ctm->tm_mon + 1]);
+    sprintf(hd->day, "%d", ctm->tm_mday);
+    sprintf(hd->year, "%d", ctm->tm_year + 1900);
+    sprintf(hd->time, "%d:%d", ctm->tm_hour, ctm->tm_min);
+    strcpy(hd->zone, "ST"); 
+    sprintf(hd->offset, "8:00");
+    sprintf(hd->lon, "122:00W");
+    sprintf(hd->lat, "37:23N");
+
+    horoscope(hd);
 }
 
 void
 star()
 {
-    tHorDetails hd;
-    tHorDetails ht;
+    tHorDetails hd, ht;
     FILE *wfp = stdout;
     char str[STR_LEN];
     char *qs;
@@ -330,7 +350,6 @@ star()
     int j;
     int k;
     int len;
-    int diff;
 
     fprintf(wfp, "Content-Type: application/json;charset=UTF-8\n\n");
     fflush(wfp);
@@ -376,16 +395,21 @@ star()
             break;
         }
     }
-
     if (flag) {
+        int diff;
+
         horoscope(&hd);
-        printf("Star: %s Rasi: %s (%d)\n", hd.naksatra, hd.rasi, hd.ra);
+        printf("Star: %s Rasi: %s %d\n", hd.naksatra, hd.rasi, hd.ra);
+        transit(&ht);
+        if (1) {
+            printhd(&ht);
+        }
+        printf("Transit Star: %s Rasi: %s %d\n", ht.naksatra, ht.rasi, ht.ra);
+
+        diff = findDiff(hd.ra, ht.ra, 12);
+
+        printf("diff %d %s\n", diff, moPred[diff]);
     }
-
-    transit(&ht);
-
-    diff = findDiff(hd.ra, ht.ra, 12);
-    printf("Diff %d %s\n", diff, moPred[diff]);
 }
 
 int
@@ -396,6 +420,6 @@ main(int argc, char *argv[])
     if (strcmp(base, "rasi") == 0) {
         star();
     }
-
+    
     exit(0);
 }
