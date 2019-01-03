@@ -200,13 +200,6 @@ strip_blanks(char *name, char *s)
     name[k] = '\0';
 }
 
-static char *mon[] = { "",
-    "Jan", "Feb", "Mar",
-    "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep",
-    "Oct", "Nov", "Dec"
-};
-
 /*
 void
 transithd(tHorDetails *hd)
@@ -229,7 +222,6 @@ transithd(tHorDetails *hd)
     strcpy(hd->lon, "122:00W");
     strcpy(hd->lat, "37:23N");
     hd->dst = 1;
-}
 }*/
 
 void
@@ -306,18 +298,6 @@ int
 findDiff(int pos1, int pos2, int base)
 {
     int diff;
-    
-    if (pos2 = pos1) {
-        diff = pos1 - pos2;
-    } else {
-        diff = pos2 - pos1;
-    }
-    
-    if (diff < 0) {
-        diff += base;
-    }
-
-    diff += 1;
 
     if (pos1 >= pos2) {
         diff = base - pos1 + pos2 + 1;
@@ -332,20 +312,6 @@ findDiff(int pos1, int pos2, int base)
     return diff;
 }
 
-void
-transit(tHorDetails *hd)
-{
-    memset(hd, 0, sizeof(tHorDetails));
-
-    transithd(hd);
-    if (0) {
-        printhd(hd);
-    }
-
-    if (1) {
-        horoscope(hd);
-        printf("Transit Star: %s Rasi: %s (%d)\n", hd->naksatra, hd->rasi, hd->ra);
-    }
 /* constructor for hard coded tHorDetails object (values hard coded for testing purposes)
  */
 void
@@ -374,8 +340,6 @@ transit(tHorDetails *hd)
 void
 star()
 {
-    tHorDetails hd;
-    tHorDetails ht;
     tHorDetails hd, ht;
     FILE *wfp = stdout;
     char str[STR_LEN];
@@ -386,7 +350,6 @@ star()
     int j;
     int k;
     int len;
-    int diff;
 
     fprintf(wfp, "Content-Type: application/json;charset=UTF-8\n\n");
     fflush(wfp);
@@ -436,7 +399,6 @@ star()
         int diff;
 
         horoscope(&hd);
-        printf("Star: %s Rasi: %s (%d)\n", hd.naksatra, hd.rasi, hd.ra);
         printf("Star: %s Rasi: %s %d\n", hd.naksatra, hd.rasi, hd.ra);
         transit(&ht);
         if (1) {
@@ -448,11 +410,6 @@ star()
 
         printf("diff %d %s\n", diff, moPred[diff]);
     }
-
-    transit(&ht);
-
-    diff = findDiff(hd.ra, ht.ra, 12);
-    printf("Diff %d %s\n", diff, moPred[diff]);
 }
 
 int
