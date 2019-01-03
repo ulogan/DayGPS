@@ -21,8 +21,7 @@ static char *rasi[] = {
     "Makara",   "Kumbha",       "Meena"
 };
 
-<<<<<<< HEAD
-=======
+=========
 static char *mon[] = { "",
     "Jan", "Feb", "Mar",
     "Apr", "May", "Jun",
@@ -31,7 +30,6 @@ static char *mon[] = { "",
 };
 
 /* array of possible Alexa return values for what a user's day will look like based on moon and rasi positions */
->>>>>>> upstream/master
 static char *moPred[] = {
     "",
     "Good relations with women and friends, good food",
@@ -203,7 +201,6 @@ strip_blanks(char *name, char *s)
     name[k] = '\0';
 }
 
-<<<<<<< HEAD
 static char *mon[] = { "",
     "Jan", "Feb", "Mar",
     "Apr", "May", "Jun",
@@ -211,9 +208,7 @@ static char *mon[] = { "",
     "Oct", "Nov", "Dec"
 };
 
-=======
 /*
->>>>>>> upstream/master
 void
 transithd(tHorDetails *hd)
 {
@@ -235,11 +230,8 @@ transithd(tHorDetails *hd)
     strcpy(hd->lon, "122:00W");
     strcpy(hd->lat, "37:23N");
     hd->dst = 1;
-<<<<<<< HEAD
 }
-=======
 }*/
->>>>>>> upstream/master
 
 void
 gethd(char *optarg, tHorDetails *hd)
@@ -299,8 +291,6 @@ gethd(char *optarg, tHorDetails *hd)
     }
 }
 
-<<<<<<< HEAD
-=======
 /* findDiff function updated with correct formula
  * Logic: -if position one is greater than position two,
  *              then the difference is the number of spaces from
@@ -313,12 +303,10 @@ gethd(char *optarg, tHorDetails *hd)
  *                  the formula will return '13' example of 6 and 6: ((12-6)+6+1),
  *                  however this is a special corner case and the value should be one
  */
->>>>>>> upstream/master
 int
 findDiff(int pos1, int pos2, int base)
 {
     int diff;
-<<<<<<< HEAD
     
     if (pos2 = pos1) {
         diff = pos1 - pos2;
@@ -331,7 +319,6 @@ findDiff(int pos1, int pos2, int base)
     }
 
     diff += 1;
-=======
 
     if (pos1 >= pos2) {
         diff = base - pos1 + pos2 + 1;
@@ -342,12 +329,10 @@ findDiff(int pos1, int pos2, int base)
     } else {
         diff = abs(pos1 - pos2) + 1;
     }
->>>>>>> upstream/master
 
     return diff;
 }
 
-<<<<<<< HEAD
 void
 transit(tHorDetails *hd)
 {
@@ -362,7 +347,6 @@ transit(tHorDetails *hd)
         horoscope(hd);
         printf("Transit Star: %s Rasi: %s (%d)\n", hd->naksatra, hd->rasi, hd->ra);
     }
-=======
 /* constructor for hard coded tHorDetails object (values hard coded for testing purposes)
  */
 void
@@ -386,18 +370,14 @@ transit(tHorDetails *hd)
     sprintf(hd->lat, "37:23N");
 
     horoscope(hd);
->>>>>>> upstream/master
 }
 
 void
 star()
 {
-<<<<<<< HEAD
     tHorDetails hd;
     tHorDetails ht;
-=======
     tHorDetails hd, ht;
->>>>>>> upstream/master
     FILE *wfp = stdout;
     char str[STR_LEN];
     char *qs;
@@ -457,9 +437,7 @@ star()
         int diff;
 
         horoscope(&hd);
-<<<<<<< HEAD
         printf("Star: %s Rasi: %s (%d)\n", hd.naksatra, hd.rasi, hd.ra);
-=======
         printf("Star: %s Rasi: %s %d\n", hd.naksatra, hd.rasi, hd.ra);
         transit(&ht);
         if (1) {
@@ -470,7 +448,6 @@ star()
         diff = findDiff(hd.ra, ht.ra, 12);
 
         printf("diff %d %s\n", diff, moPred[diff]);
->>>>>>> upstream/master
     }
 
     transit(&ht);
