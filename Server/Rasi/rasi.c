@@ -21,7 +21,6 @@ static char *rasi[] = {
     "Makara",   "Kumbha",       "Meena"
 };
 
-=========
 static char *mon[] = { "",
     "Jan", "Feb", "Mar",
     "Apr", "May", "Jun",
