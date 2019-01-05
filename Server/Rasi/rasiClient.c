@@ -39,7 +39,6 @@ main(int argc, char *argv[])
         for (j = 1; j <= b; j++) {
             diff = findDiff(i, j, b);
             printf("pos1 = %d, pos2 = %d, diff = %d\n", i, j, diff);
-            //printf("%s\n", moPred[diff]);
         }
     }
     
