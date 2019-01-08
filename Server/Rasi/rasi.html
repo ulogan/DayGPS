@@ -1,25 +1,113 @@
-<form>
   Name: <input type="text" id="name"><br>
-  Address: <input type="text" id="address"><br>
+  Current Address: <input type="text" id="caddress"><br>
+  Birth Address: <input type="text" id="address"><br>
   Birthday: <input type="date" id="bday"><br>
   BirthTime: <input type="time" id="btime"><br>
    
-<input type="submit" onclick="getCity" id="submit">
+<input type="submit" onclick="rasi()" id="submit">
 <br>
 Lat: <input type="text" id="lat"> Lon: <input type="text" id="lon">
-</form>
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
+<script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript">
 
+mbAccessToken = "pk.eyJ1IjoicGFjbWFuOTkiLCJhIjoiY2pxbzFyYW15N296ZjQzdWx1amR6bnltNiJ9.N8Cwm98SJDU1Ix5PwyZgkw"
 
-function getCity() {
+function formatDec(dec, lat) {
+/*
+input decimal latitude or longitude
+set lat to True if latitude else its longitude
+*/
     
-    var address = document.getElementById("address");
-    String encodedAddress = URLEncoder.encode(address, "UTF-8");
-    //Send request and receive json data by address
-    geo = $.getJSON("https://nominatim.openstreetmap.org/search/" + encodedAddress + "?format=json" , function(data) {
-        alert(data.lat + data.lon);        
+    vdec = Math.abs(dec);
+    var deg = Math.floor(vdec);
+    var min = Math.round((vdec - deg) * 60);
+
+    if (deg < 0) {
+        var deg = Math.abs(deg);
+        if (lat) {
+            var let = "N";
+        } else {
+            var let = "W";
+        }
+    } else {
+        if (lat) {
+            var let = "S";
+        } else {
+            var let = "E";
+        }
+    }
+
+    if (deg < 10) {
+        deg = "0" + deg.toString();
+    } else {
+        deg = deg.toString();
+    }
+    if (min < 10) {
+        min = "0" + min.toString();
+    } else {
+        min = min.toString();
+    }
+    
+    return deg + ":" + min + let;
+
+}
+
+function getCoords(address) {
+
+    var geoData = [];
+
+    /*
+    $.ajax({
+      url: 'https://nominatim.openstreetmap.org/search/' + encodeURIComponent(address) + '?format=json',
+      async: false,
+      dataType: 'json',
+      success: function (json) {
+        geoData = json[0];
+        if (1) {
+            console.log(json);
+        }
+      }
     });
+    */
+
+    $.ajax({
+      url: "https://api.mapbox.com/geocoding/v5/mapbox.places/" + encodeURIComponent(address) + ".json?access_token=" + mbAccessToken,
+      async: false,
+      dataType: 'json',
+      success: function (json) {
+        geoData = json.features[0].center;
+        if (0) {
+            console.log(json);
+        }
+      }
+    });
+    
+    var elon = geoData[0];
+    var elat = geoData[1];
+
+    if (1) {
+        console.log([elon, elat]);
+    }
+    
+    var lon = formatDec(elon, false);
+    var lat = formatDec(elat, true);
+    
+    var results = lon + "|" + lat;
+
+    if (0) {
+        console.log(results);
+    }
+
+    return results;
+
+}
+
+function rasi() {
+
+    var address = document.getElementById("address").value;
+    var coord = getCoords(address);
+    console.log(coord);
 
 }
 </script>
