@@ -1,23 +1,25 @@
 <form>
-  Name: <input type="text" name="name"><br>
-  Current City: <input type="text" name="city"><br>
-  Birthday: <input type="date" name="bday"><br>
-  BirthTime: <input type="time" name="btime"><br>
+  Name: <input type="text" id="name"><br>
+  Address: <input type="text" id="address"><br>
+  Birthday: <input type="date" id="bday"><br>
+  BirthTime: <input type="time" id="btime"><br>
    
-<input type="submit" name="submit">
+<input type="submit" onclick="getCity" id="submit">
 <br>
 Lat: <input type="text" id="lat"> Lon: <input type="text" id="lon">
 </form>
-<script>
-$("#submit").onclick = function() {
-    var city = $(this).val()
-    $.getJSON("https://maps.googleapis.com/maps/api/geocode/json?address="+encodeURIComponent(city), function(val)
-    {
-        if(val.results.length) {
-            var location = val.results[0].geometry.location
-            $("#lat").val(location.lat)
-            $("#lon").val(location.lng)
-        }
-    })
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript">
+
+
+function getCity() {
+    
+    var address = document.getElementById("address");
+    String encodedAddress = URLEncoder.encode(address, "UTF-8");
+    //Send request and receive json data by address
+    geo = $.getJSON("https://nominatim.openstreetmap.org/search/" + encodedAddress + "?format=json" , function(data) {
+        alert(data.lat + data.lon);        
+    });
+
 }
 </script>
