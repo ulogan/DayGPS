@@ -200,30 +200,6 @@ strip_blanks(char *name, char *s)
     name[k] = '\0';
 }
 
-/*
-void
-transithd(tHorDetails *hd)
-{
-    struct tm *ctm;
-    time_t lclock;
-
-    lclock = time(&lclock);
-    ctm = localtime(&lclock);
-
-    strcpy(hd->name, "Transit");
-    strcpy(hd->place, "Sunnyvale");
-
-    sprintf(hd->day, "%d", ctm->tm_mday);
-    sprintf(hd->year, "%d", ctm->tm_year + 1900);
-    strcpy(hd->mon, mon[ctm->tm_mon + 1]);
-    sprintf(hd->time, "%d:%d", ctm->tm_hour, ctm->tm_min);
-    strcpy(hd->zone, "ST");
-    strcpy(hd->offset, "-8:00");
-    strcpy(hd->lon, "122:00W");
-    strcpy(hd->lat, "37:23N");
-    hd->dst = 1;
-}*/
-
 void
 gethd(char *optarg, tHorDetails *hd)
 {

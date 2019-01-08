@@ -1,0 +1,16 @@
+
+Followed the instruction in
+
+https://deliciousbrains.com/https-locally-without-browser-privacy-errors/
+
+Created a directory "Cert" and added scripts following the above link.
+
+Arjun already spent time in how to configure https on the server side
+
+Add a entry in /etc/hosts file (MAC)
+
+192.168.56.101  dev.daygps.com 
+
+curl -k https://dev.daygps.com
+Both Safari and Chrome works
+
