@@ -1,17 +1,20 @@
   Name: <input type="text" id="name"><br>
-  Current Address: <input type="text" id="caddress"><br>
-  Birth Address: <input type="text" id="address"><br>
+  Current Address: <input placeholder="1234 street dr, city, state" type="text" id="caddress"><br>
+  Birth Address: <input placeholder="1234 street dr, city, state" type="text" id="baddress"><br>
   Birthday: <input type="date" id="bday"><br>
-  BirthTime: <input type="time" id="btime"><br>
+  <small>Give the time in the timezone of the birth address</small>
+  BirthTime: <input placeholder="00:00am" type="text" id="btime">
+  <small style="color:#ff0000;" id="btimeError"></small>
    
-<input type="submit" onclick="rasi()" id="submit">
+<br><input onclick="rasi()" type="submit" id="rasiSubmit">
 <br>
-Lat: <input type="text" id="lat"> Lon: <input type="text" id="lon">
+<p id="linkOutput"></p>
 
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript">
 
-mbAccessToken = "pk.eyJ1IjoicGFjbWFuOTkiLCJhIjoiY2pxbzFyYW15N296ZjQzdWx1amR6bnltNiJ9.N8Cwm98SJDU1Ix5PwyZgkw"
+mbAccessToken = "pk.eyJ1IjoicGFjbWFuOTkiLCJhIjoiY2pxbzFyYW15N296ZjQzdWx1amR6bnltNiJ9.N8Cwm98SJDU1Ix5PwyZgkw";
+gnUser = "pacman99";
 
 function formatDec(dec, lat) {
 /*
@@ -64,7 +67,7 @@ function getCoords(address) {
       dataType: 'json',
       success: function (json) {
         geoData = json[0];
-        if (1) {
+        if (0) {
             console.log(json);
         }
       }
@@ -85,10 +88,6 @@ function getCoords(address) {
     
     var elon = geoData[0];
     var elat = geoData[1];
-
-    if (1) {
-        console.log([elon, elat]);
-    }
     
     var lon = formatDec(elon, false);
     var lat = formatDec(elat, true);
@@ -97,17 +96,78 @@ function getCoords(address) {
 
     if (0) {
         console.log(results);
+        console.log(elon);
+        console.log(elat);
     }
 
-    return results;
+    return [results, elon, elat];
 
 }
 
-function rasi() {
+function findOffset(lon, lat) {
 
-    var address = document.getElementById("address").value;
-    var coord = getCoords(address);
-    console.log(coord);
+    var offset;
+
+    $.ajax({
+        url: "http://api.geonames.org/timezoneJSON?lat=" + lat + "&lng=" + lon + "&username=" + gnUser,
+        async: false,
+        dataType: 'json',
+        success: function (json) {
+            offset = json.gmtOffset;
+        }
+    });
+
+    if (0) {
+        console.log(offset);
+    }
+
+    var min = ":30";
+    if (offset % 1 == 0) {
+        min = ":00";
+    }
+
+    offset = Math.trunc(offset);
+    offset = offset * -1;
+
+    return offset.toString() + min;
+
+}
+
+var rasi = function() {
+
+    var btime = document.getElementById("btime").value;
+    if (!(/(0?[1-9]|1[0-2]):(0?[1-9]|1[0-2])[ap]m/.test(btime)))  {
+        document.getElementById("btimeError").innerHTML = "The time must be in hr:minpm format, ex: 1:32am";
+        return false;
+    }
+
+    var caddress = document.getElementById("caddress").value;
+    var ccoord = getCoords(caddress);
+    var caddress = caddress.replace(" ", "");
+
+    var baddress = document.getElementById("baddress").value;
+    var bcoord = getCoords(baddress);
+    var baddress = baddress.replace(" ", "");
+
+    var offset = findOffset(bcoord[1], bcoord[2]);
+
+    var baselink = "/cgi-bin/rasi?name=";
+    var name = document.getElementById("name").value.replace(" ", "");
+
+    var bdayInput = document.getElementById("bday").value;
+    console.log(bdayInput);
+    bday = bdayInput.substr(5) + "-" + bdayInput.substr(0,5)
+    bday = bday.replace(/-/g, "|").slice(0,-1);
+
+    var final = baselink + name + "|" + baddress + "|" + bday + "|" + btime + "|" + "ST|" + offset + "|" + bcoord[0] + "|" + ccoord[0];
+    
+    if (0) {
+        console.log(final);
+    }
+
+    document.getElementById('linkOutput').innerHTML = final;
+
+    window.location.replace(final);
 
 }
 </script>
