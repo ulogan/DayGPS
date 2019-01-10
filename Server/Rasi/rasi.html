@@ -136,7 +136,7 @@ function findOffset(lon, lat) {
 var rasi = function() {
 
     var btime = document.getElementById("btime").value;
-    if (!(/(0?[1-9]|1[0-2]):(0?[1-9]|1[0-2])[ap]m/.test(btime)))  {
+    if (!(/(0?[1-9]|1[0-2]):(0?[1-9]|[0-6][0-9])[ap]m/.test(btime)))  {
         document.getElementById("btimeError").innerHTML = "The time must be in hr:minpm format, ex: 1:32am";
         return false;
     }
