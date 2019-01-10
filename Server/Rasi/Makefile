@@ -19,3 +19,5 @@ clean:
 
 install:
 	cp rasi /var/www/cgi-bin/rasi
+	cp rasi.html /var/www/html/rasi.html
+	cp jquery.js /var/www/html/jquery.js
