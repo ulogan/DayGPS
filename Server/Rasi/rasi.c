@@ -201,7 +201,7 @@ strip_blanks(char *name, char *s)
 }
 
 void
-gethd(char *optarg, tHorDetails *hd)
+gethd(char *optarg, tHorDetails *hd, tHorDetails *ht)
 {
     int i;
     int imon;
@@ -243,6 +243,15 @@ gethd(char *optarg, tHorDetails *hd)
             strcpy(hd->lat, s);
             break;
         case 10:
+            strcpy(ht->place, s);
+            break;
+        case 11:
+            strcpy(ht->lon, s);
+            break;
+        case 12:
+            strcpy(ht->lat, s);
+            break;
+        case 13:
             break;
         }
     }
@@ -266,8 +275,8 @@ gethd(char *optarg, tHorDetails *hd)
  *        -if position two is greater than position one the value is
  *              simply the absolute value of position one minus position 2
  *              (1 is added for same reason of 0 based indexing) 
- * Conditions: if position one and position two are equal,
- *                  the formula will return '13' example of 6 and 6: ((12-6)+6+1),
+  Conditions: if position one and position two are equal,
+                   the formula will return '13' example of 6 and 6: ((12-6)+6+1),
  *                  however this is a special corner case and the value should be one
  */
 int
@@ -288,8 +297,6 @@ findDiff(int pos1, int pos2, int base)
     return diff;
 }
 
-/* constructor for hard coded tHorDetails object (values hard coded for testing purposes)
- */
 void
 transit(tHorDetails *hd)
 {
@@ -300,15 +307,12 @@ transit(tHorDetails *hd)
     ctm = localtime(&clock);
 
     strcpy(hd->name, "Transit");
-    strcpy(hd->place, "Sunnyvale");
     strcpy(hd->mon, mon[ctm->tm_mon + 1]);
     sprintf(hd->day, "%d", ctm->tm_mday);
     sprintf(hd->year, "%d", ctm->tm_year + 1900);
     sprintf(hd->time, "%d:%d", ctm->tm_hour, ctm->tm_min);
     strcpy(hd->zone, "ST"); 
     sprintf(hd->offset, "8:00");
-    sprintf(hd->lon, "122:00W");
-    sprintf(hd->lat, "37:23N");
 
     horoscope(hd);
 }
@@ -363,7 +367,7 @@ star()
                 }
             }
 
-            gethd(str, &hd);
+            gethd(str, &hd, &ht);
             if (0) {
                 printhd(&hd);
             }
