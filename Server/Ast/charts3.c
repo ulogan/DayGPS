@@ -38,6 +38,33 @@
 
 #include "astrolog.h"
 
+
+#ifdef LOGAN
+#include "astrosee.h"
+char *sign[] = { "Ari", "Tau", "Gem", "Can",
+                 "Leo", "Vir", "Lib", "Sco",
+                 "Sag", "Cap", "Aqu", "Pis" };
+
+char *splanet[] = { "Sun", "Moo", "Mer", "Ven", "Mar",
+                    "Jup", "Sat", "Rah", "Ket", "Lag", "Lagc", "Lags" };
+
+tplnData pln[DAYS_IN_MONTH][MINS_IN_DAY][eMaxPla];
+
+void assignPln(tplnData *plan, double pdeg, double ret)
+{
+    double deg;
+    
+    deg = Mod(pdeg + rRound/60.0/60.0);
+    plan->deg = deg;
+
+    plan->ret = ret;
+
+    plan->rasi = deg / 30.0;
+    plan->nak = deg / (360 / 27.0);
+    plan->amsa = (int)(deg / (360 / 108.0)) % 12;
+}
+#endif /* LOGAN */
+
 bool VedicAspect(obj1, asp, obj2)
 int obj1, asp, obj2;
 {
@@ -414,6 +441,7 @@ real rdeg;
   return(padam + offset);
 }
 
+extern int csvdeg;
 extern int navasp;
 extern int naksatra;
 extern int autodst;
@@ -624,6 +652,9 @@ bool fProg;
   real time[MAXINDAY], divsiz, d1, d2, e1, e2, f1, f2, g;
   extern real lret[objMax];
   CI ciT;
+#ifdef LOGAN
+  int dmin;
+#endif /* LOGAN */
 
   /* If parameter 'fProg' is set, look for changes in a progressed chart. */
 
@@ -655,6 +686,9 @@ bool fProg;
     occurcount = 0;
 
 #ifdef LOGAN
+    if (0) {
+        printf("Mon %d Day2 %d\n", fYear ? Mon2 : Mon, Day2);
+    }
     if (autodst) {
         Dst = findDst(fYear ? Mon2 : Mon, Day2, yea0, 0);
     }
@@ -680,7 +714,9 @@ bool fProg;
     for (i = 1; i <= cObj; i++) {
       cp2.obj[i] = planet[i];
 #ifdef LOGAN
-      if (naksatra) {
+      if (csvdeg) {
+          // Nothing to do
+      } else if (naksatra) {
         if (i != oMoo) {
             continue;
         }
@@ -705,13 +741,14 @@ bool fProg;
     /* Now divide the day into segments and search each segment in turn. */
     /* More segments is slower, but has slightly better time accuracy.   */
 
-    for (div = 1; div <= division; div++) {
+    for (div = 0; div <= division; div++) {
         real curTime = DegToDec(24.0*(real)div/(real)division);
 
       /* Cast the chart for the ending time of the present segment. The   */
       /* beginning time chart is copied from the previous end time chart. */
 
 #ifdef LOGAN
+      dmin = div;
       if (autodst) {
         Dst = findDst(fYear ? Mon2 : Mon, Day2, yea0, (int)curTime);
       }
@@ -727,15 +764,32 @@ bool fProg;
         cp1.cusp[i] = cp2.cusp[i]; cp1.house[i] = cp2.house[i];
         cp2.cusp[i] = house[i];  cp2.house[i] = inhouse[i];
       }
+#ifdef LOGAN
       /* Get Ketu's position hard coded -Logan */
       planet[17] = Mod(planet[16] + 180);
       ret[17] = ret[16];
+      if (csvdeg) {
+          // ascendant (lagna)
+          assignPln(&pln[Day2][dmin][eLag], planet[21], ret[21]);
+      }
+#endif /* LOGAN */
       for (i = 1; i <= cObj; i++) {
         cp1.obj[i] = cp2.obj[i]; cp1.dir[i] = cp2.dir[i];
         cp2.obj[i] = planet[i];  cp2.dir[i] = ret[i];
 #ifdef LOGAN
         cp1.navamsa[i] = cp2.navamsa[i];
-        if (naksatra) {
+        if (csvdeg) {
+            if (ignore[i]) {
+                continue;
+            }
+            if (i == 16) {
+                assignPln(&pln[Day2][dmin][eRah], planet[16], ret[16]);
+            } else if (i == 17) {
+                assignPln(&pln[Day2][dmin][eKet], planet[17], ret[17]);
+            } else if ((i >= 1) && (i <= 7)) {
+                assignPln(&pln[Day2][dmin][i - 1], planet[i], ret[i]);
+            }
+        } else if (naksatra) {
           if (i != oMoo) {
               continue;
           }
@@ -755,6 +809,38 @@ bool fProg;
         }
 #endif /* LOGAN */
       }
+
+#ifdef LOGAN
+      if (csvdeg) {
+          if ((Lon == 74.00) && (Lat == 40.42)) { /* New York */
+              // Get Asc for other 2 lagna
+              extern real getAsc(long, int);
+              struct tm ltm;
+              long lclock;
+
+              memset(&ltm, 0, sizeof(struct tm));
+              ltm.tm_min = dmin % 60;
+              ltm.tm_hour = dmin / 60;
+              ltm.tm_mday = Day2;
+              ltm.tm_mon = Mon - 1;
+              ltm.tm_year = yea0 - 1900;
+              ltm.tm_isdst = SS;
+
+              // printf("MM %3d DD %3d YY %6d Time %d\n", Mon, Day2, yea0, dmin);
+
+              lclock = mktime(&ltm);
+
+              // Asc 2 is Chicago
+              assignPln(&pln[Day2][dmin][eLagc], getAsc(lclock, -1), 0);
+
+              // Asc 3 is Sunnyvale
+              assignPln(&pln[Day2][dmin][eLags], getAsc(lclock, -3), 0);
+          }
+
+          // Nothing more to do
+          continue;
+      }
+#endif /* LOGAN */
 
       /* Now search through the present segment for anything exciting. */
 
@@ -804,6 +890,10 @@ bool fProg;
           occurcount++;
         }
 
+        if (tithi) {
+            continue;
+        }
+
 #endif /* LOGAN */
 
         /* Does the current planet change into the next or previous sign? */
@@ -843,10 +933,6 @@ bool fProg;
             RAbs(cp2.dir[i]))*divsiz + (real)(div-1)*divsiz;
           sign1[occurcount] = sign2[occurcount] = s1+1;
           occurcount++;
-        }
-
-        if (tithi) {
-            continue;
         }
 
         /* Now search for anything making an aspect to the current planet. */

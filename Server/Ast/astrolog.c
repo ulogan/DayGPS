@@ -51,9 +51,11 @@ int navamsam = 0;
 int secstrue = 0;
 int regular = 1;
 int csv = 0;
+int csvdeg = 0;
 int predictor = 0;
 int stockAspect = 0;
 int matchdata = 0;
+int plndata = 0;
 int yoga = 0;
 
 extern int findDst(int, int, int, int);
@@ -1390,7 +1392,8 @@ char **argv;
     case '%': /* Yogas */
       yoga = 1;
       break;
-    case '?': // Unused
+    case '?': // print deg csv
+      csvdeg = 1;
       break;
     case '4':
       navasp = 1;
@@ -1426,6 +1429,9 @@ char **argv;
       break;
     case '!':
       matchdata = 1;
+      break;
+    case '#':
+      plndata = 1;
       break;
 #endif
 
@@ -1898,7 +1904,9 @@ LBegin:
     us.fLoop = us.fNoSwitches = fTrue;
     goto LBegin;
   }
-  Terminate(tcOK);    /* The only standard place to exit Astrolog is here. */
+  if ((csvdeg == 0) && (plndata == 0)) {
+      Terminate(tcOK);    /* The only standard place to exit Astrolog is here. */
+  }
 }
 #endif /* NOMAIN */
 #endif /* WIN */

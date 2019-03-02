@@ -50,6 +50,10 @@ real lret[objMax];
 #define LOGAN
 #ifdef LOGAN
 
+#include "astrosee.h"
+
+  tplnData dpln[eMaxPla];
+
   char *tithis[] = { "", "S.Pratipat", "S.Dvitiya", "S.Tritiya",
                      "S.Chaturthi", "S.Panchami", "S.Shasthi",
                      "S.Saptami", "S.Ashtami", "S.Navami",
@@ -470,68 +474,68 @@ getPlanet(int planet, int position)
 
 predProfession(int asc)
 {
-            /* For profession */
-        int prof = (asc + 9);
-        int lo;
-        int lh;
-        int li;
-        int lj;
+    /* For profession */
+    int prof = (asc + 9);
+    int lo;
+    int lh;
+    int li;
+    int lj;
 
-        if (prof > 12) {
-                prof -= 12;
-        }
-        prof--; /* Index starts at 0 */
+    if (prof > 12) {
+        prof -= 12;
+    }
+    prof--; /* Index starts at 0 */
 
-        printf("10th Lord %s is in the ", lord[prof]);
+    printf("10th Lord %s is in the ", lord[prof]);
 
-        for (li = 0; li < 12; li++) {
-                for (lj = 0; lj < chr[li].count; lj++) {
-                        if (pindex[prof] == chr[li].index[lj]) {
+    for (li = 0; li < 12; li++) {
+        for (lj = 0; lj < chr[li].count; lj++) {
+            if (pindex[prof] == chr[li].index[lj]) {
 
-                                lh = li + 1;
-                                lo = lh - asc;
-                                if (lo < 0) {
-                                        lo += 12;
-                                }
-                                printf("%d House ", lo + 1);
-                                break;
-                        }
+                lh = li + 1;
+                lo = lh - asc;
+                if (lo < 0) {
+                    lo += 12;
                 }
+                printf("%d House ", lo + 1);
+                break;
+            }
         }
+    }
 
-        getPlanet(pindex[prof], lh - 1);
+    getPlanet(pindex[prof], lh - 1);
 
-        for (li = 0; li < 12; li++) {
-                for (lj = 0; lj < chr[li].navacount; lj++) {
-                        if (pindex[prof] == chr[li].navaindex[lj]) {
+    for (li = 0; li < 12; li++) {
+        for (lj = 0; lj < chr[li].navacount; lj++) {
+            if (pindex[prof] == chr[li].navaindex[lj]) {
 
-                                lh = li;
-                                /*
-                                lo = lh - asc;
-                                if (lo < 0) {
-                                        lo += 12;
-                                }
-                                printf("%d House ", lo + 1);
-                                */
-                                break;
-                        }
-                }
+                lh = li;
+                /*
+                   lo = lh - asc;
+                   if (lo < 0) {
+                   lo += 12;
+                   }
+                   printf("%d House ", lo + 1);
+                   */
+                break;
+            }
         }
+    }
 
-        printf("Navamsa ");
-        getPlanet(pindex[prof], lh - 1);
+    printf("Navamsa ");
+    getPlanet(pindex[prof], lh - 1);
 
-        printf("\n");
+    printf("\n");
 
-        printf("Planets in the 10th House: ");
-        for (lj = 0; lj < chr[prof].count; lj++) {
+    printf("Planets in the 10th House: ");
+    for (lj = 0; lj < chr[prof].count; lj++) {
 
-                printf("%s ", plan[chr[prof].index[lj]]);
+        printf("%s ", plan[chr[prof].index[lj]]);
 
-                getPlanet(chr[prof].index[lj], prof);
+        getPlanet(chr[prof].index[lj], prof);
 
-        }
-        printf("\n");
+    }
+    printf("\n");
 }
 
 #define MIN (60)
@@ -573,7 +577,9 @@ real getAsc(long clock, int flag)
         DD = NParseSz(day, pmDay);
         YY = NParseSz(year, pmYea);
         TT = RParseSz(ltm, pmTim);
-        // printf("MM %d DD %d YY %d Time %f\n", MM, DD, YY, TT);
+
+        // printf("-->MM %3d DD %3d YY %6d Time %f\n", MM, DD, YY, TT);
+
         if ((flag == 2) || (flag == -1)) {
             dst = "CST";
         } else if (flag == 3) {
@@ -621,6 +627,7 @@ void ChartListing()
   real rT;
 
 #ifdef LOGAN
+  int flag = 0;
   int li;
   int lj;
   char zod[4];
@@ -672,6 +679,22 @@ void ChartListing()
   char lag2[6];
   char lag3[6];
   extern int matchdata;
+  extern int plndata;
+  extern void assignPln(tplnData *, double, double);
+
+  if (plndata) {
+      int i;
+
+      for (i = 1; i <= 7; i++) {
+          assignPln(&dpln[i - 1], planet[i], ret[i]);
+      }
+
+      assignPln(&dpln[eRah], planet[16], ret[16]);
+      assignPln(&dpln[eKet], Mod(planet[16] + 180), ret[16]);
+      assignPln(&dpln[eLag], planet[21], ret[21]);
+
+      return;
+  }
 
   if (matchdata) {
       printf("%f\n", planet[oMoo]);
@@ -750,17 +773,17 @@ void ChartListing()
       while (i <= oCore && j <= oCore && ignore[j])
         j++;
     }
-    if (i <= oCore && j > oCore)
-      PrintTab(' ', 51);
-    else {
+    if (i <= oCore && j > oCore) {
+      // PrintTab(' ', 51);
+    } else {
       if (i > oCore)
         j = i;
 #ifdef LOGAN
       {
-        static int flag = 0;
         if (flag == 0)
         {
           flag = 1;
+          memset(chr, 0, sizeof(chr));
           strcpy(chr[0].name, "Ari");
           strcpy(chr[1].name, "Tau");
           strcpy(chr[2].name, "Gem");
@@ -773,18 +796,6 @@ void ChartListing()
           strcpy(chr[9].name, "Cap");
           strcpy(chr[10].name, "Aqu");
           strcpy(chr[11].name, "Pis");
-          for (li = 0; li < 12; li++)
-          {
-            chr[li].count = 0;
-            chr[li].navacount = 0;
-            for (lj = 0; lj < 8; lj++)
-            {
-              chr[li].planet[lj][0] = '\0';
-              chr[li].navamsam[lj][0] = '\0';
-              chr[li].deg[lj][0] = '\0';
-              chr[li].mdeg[lj][0] = '\0';
-            }
-          }
         }
         if (strncmp(szObjName[j], "Ketu", 4) == 0)
           continue;
@@ -1002,12 +1013,9 @@ void ChartListing()
     real rasc;
     struct tm ltm;
     long lclock;
-    long clock;
     int flag1 = 0;
     int flag2 = 0;
 
-    time(&clock);
-    
     memset(&ltm, 0, sizeof(struct tm));
     ltm.tm_min = (int)(RFract(RAbs(Tim)) * 100.0 + rRound / 60.0);
     ltm.tm_hour = NFloor(Tim);
